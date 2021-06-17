@@ -1,0 +1,35 @@
+def enhance_contrast(self, image_matrix, bins=256):
+        image_flattened = image_matrix.flatten()
+        image_hist = np.zeros(bins)
+
+        # frequency count of each pixel
+        for pix in image_matrix:
+            image_hist[pix] += 1
+
+        # cummulative sum
+        cum_sum = np.cumsum(image_hist)
+        norm = (cum_sum - cum_sum.min()) * 255
+        # normalization of the pixel values
+        n_ = cum_sum.max() - cum_sum.min()
+        uniform_norm = norm / n_
+        uniform_norm = uniform_norm.astype('int')
+
+        # flat histogram
+        image_eq = uniform_norm[image_flattened]
+        # reshaping the flattened matrix to its original shape
+        image_eq = np.reshape(a=image_eq, newshape=image_matrix.shape)
+
+        return image_eq
+
+    def equalize_this(self, image_src):
+        r_image = image_src[:, :, 0]
+        g_image = image_src[:, :, 1]
+        b_image = image_src[:, :, 2]
+
+        g_image_eq = self.enhance_contrast(g_image)
+        b_image_eq = self.enhance_contrast(b_image)
+        r_image_eq = self.enhance_contrast(r_image)
+
+        image_eq = np.dstack(tup=(r_image_eq, g_image_eq, b_image_eq))
+
+        return image_eq
